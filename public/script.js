@@ -4,8 +4,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { initializeBookshelf } from './bookshelf.js'; // Import the new function
 
 // --- SUPABASE CLIENT (Used by both carousels) ---
-const supabaseUrl = 'ww';
-const supabaseKey = 'eee';
+const supabaseUrl = 'https://gyytvnpsjazrkcfxolxg.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eXR2bnBzamF6cmtjZnhvbHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyODE4MjMsImV4cCI6MjA2OTg1NzgyM30.b58KbtxvgwzrRw_q-nSDE44a4fr-Ssxhx0MRDO9t3es';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
