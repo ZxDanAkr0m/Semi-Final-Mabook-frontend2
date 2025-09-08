@@ -1,87 +1,53 @@
+// public/componentLoader.js
+
+/**
+ * Fetches HTML content from a URL and injects it into a specified element.
+ * @param {string} url - The URL of the component to load (e.g., 'nav.html').
+ * @param {string} elementId - The ID of the HTML element to place the content in.
+ * @param {function} [callback] - An optional function to run after the component is loaded.
+ */
 function loadComponent(url, elementId, callback) {
     fetch(url)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById(elementId).innerHTML = data;
-            if (callback) callback();
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Could not load ${url}: ${response.statusText}`);
+            }
+            return response.text();
         })
-        .catch(error => console.error(`Error loading component ${url}:`, error));
+        .then(data => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = data;
+                if (callback) {
+                    callback();
+                }
+            }
+        })
+        .catch(error => console.error(`Error loading component:`, error));
 }
 
+/**
+ * Initializes the navigation bar, primarily for handling the mobile menu toggle.
+ * This function should be called after 'nav.html' has been loaded into the DOM.
+ */
 function initializeNavbar() {
-    const navLinks = document.querySelectorAll('.nav-links a');
-    const capsule = document.querySelector('.nav-links .nav-capsule');
-    if (!navLinks.length || !capsule) return;
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuText = document.getElementById('menu-text');
 
-    let isClickScrolling = false;
-    let scrollTimeout;
-
-    function moveCapsule(target) {
-        if (!target) return;
-        capsule.style.width = `${target.offsetWidth}px`;
-        capsule.style.left = `${target.offsetLeft}px`;
-        navLinks.forEach(link => link.classList.remove('active'));
-        target.classList.add('active');
+    if (mobileMenuButton && mobileMenu && menuText) {
+        mobileMenuButton.addEventListener('click', () => {
+            // Check if the menu is currently open
+            const isMenuOpen = !mobileMenu.classList.contains('hidden');
+            
+            // Toggle the menu's visibility
+            mobileMenu.classList.toggle('hidden');
+            
+            // Prevent scrolling of the body when the menu is open
+            document.body.style.overflow = isMenuOpen ? 'auto' : 'hidden';
+            
+            // Change the button text
+            menuText.textContent = isMenuOpen ? 'Menu' : 'Close';
+        });
     }
-
-    setTimeout(() => {
-        const initialActiveLink = document.querySelector('.nav-links a.active') || navLinks[0];
-        moveCapsule(initialActiveLink);
-    }, 100);
-
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const href = e.target.getAttribute('href');
-            // If the link is to another page, navigate there
-            if (!href.startsWith('#')) {
-                window.location.href = href;
-                return;
-            }
-            // Otherwise, handle smooth scroll
-            moveCapsule(e.target);
-            isClickScrolling = true;
-            const targetSection = document.querySelector(href);
-            if (targetSection) {
-                targetSection.scrollIntoView({ behavior: 'smooth' });
-            }
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => { isClickScrolling = false; }, 1000);
-        });
-    });
-
-    window.addEventListener('scroll', () => {
-        if (isClickScrolling) return;
-        const sections = Array.from(navLinks)
-            .map(link => {
-                const href = link.getAttribute('href');
-                return href.startsWith('#') ? document.querySelector(href) : null;
-            })
-            .filter(Boolean);
-
-        if (sections.length === 0) return;
-
-        let currentSectionId = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            if (window.scrollY >= sectionTop - (window.innerHeight / 3)) {
-                currentSectionId = section.getAttribute('id');
-            }
-        });
-
-        const activeLink = document.querySelector(`.nav-links a[href="#${currentSectionId}"]`);
-        if (activeLink && !activeLink.classList.contains('active')) {
-            moveCapsule(activeLink);
-        }
-    });
 }
-
-// Automatically load the footer on all pages that include this script
-document.addEventListener('DOMContentLoaded', () => {
-    loadComponent('footer.html', 'footer-container', () => {
-        const yearSpan = document.getElementById('footer-year');
-        if (yearSpan) {
-            yearSpan.textContent = new Date().getFullYear();
-        }
-    });
-});
