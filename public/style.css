@@ -141,22 +141,7 @@ body {
     font-size: 3rem;
 }
 
-.search-section textarea {
-    display: block;
-    margin: 0 auto;
-    width: 100%;
-    max-width: 1000px;
-    height: 300px;
-    padding: 2.5rem;
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    line-height: 1.5rem;
-    background-color: white;
-    border: 2px solid #424140;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
-    resize: none;
-}
+
 
 .search-section textarea:focus {
     outline: none;
